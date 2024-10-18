@@ -1,0 +1,3 @@
+Label;# Samples;Average;Min;Max;Std. Dev.;Error %;Throughput;Received KB/sec;Sent KB/sec;Avg. Bytes
+Agregar un nuevo producto;300;206;187;281;11.15;0.000%;.47233;0.32;0.16;690.0
+TOTAL;300;206;187;281;11.15;0.000%;.47233;0.32;0.16;690.0

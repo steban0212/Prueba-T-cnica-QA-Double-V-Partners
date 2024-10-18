@@ -1,0 +1,246 @@
+{
+	"info": {
+		"_postman_id": "36ac6bd8-6ed3-4b95-be56-3de0df5d5828",
+		"name": "Tienda Online",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "39071645"
+	},
+	"item": [
+		{
+			"name": "Productos",
+			"item": [
+				{
+					"name": "1. Producto por categoría",
+					"request": {
+						"method": "GET",
+						"header": []
+					},
+					"response": []
+				},
+				{
+					"name": "2. Consultar un solo producto",
+					"request": {
+						"method": "GET",
+						"header": []
+					},
+					"response": []
+				},
+				{
+					"name": "3. Agregar Producto",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"title\": \"test product\",\r\n    \"price\": 13.5,\r\n    \"description\": \"lorem ipsum set\",\r\n    \"image\": \"https: //i.pravatar.cc\",\r\n    \"category\": \"electronic\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://fakestoreapi.com/products",
+							"protocol": "https",
+							"host": [
+								"fakestoreapi",
+								"com"
+							],
+							"path": [
+								"products"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "4. Actualizar producto",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"//Validar si se incluye una palabra especifica\r",
+									"pm.test(\"Palabra especifica\", function(){\r",
+									"    pm.expect(pm.response.text()).to.include(\"https://cdn-icons-png.freepik.com/512/1581/1581279.png\");\r",
+									"});\r",
+									"\r",
+									"//Verificar que el producto actualizado sea el correcto\r",
+									"pm.test(\"Producto actualizado correctamente\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    var id = jsonData.id;\r",
+									"    pm.expect(id).to.equal(21);\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"title\": \"Nintendo Swicth\",\r\n    \"price\": 500,\r\n    \"description\": \"Consola de video juegos\",\r\n    \"image\": \"https://cdn-icons-png.freepik.com/512/1581/1581279.png\",\r\n    \"category\": \"electronic\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{API}}/products/21",
+							"host": [
+								"{{API}}"
+							],
+							"path": [
+								"products",
+								"21"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "5. Eliminar producto",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"let productsToDelete = JSON.parse(pm.environment.get(\"productsToDelete\"));\r",
+									"\r",
+									"// Verifica si hay productos para eliminar\r",
+									"if (productsToDelete.length > 0) {\r",
+									"    // Tomamos el primer producto para eliminar\r",
+									"    let productId = productsToDelete.shift();\r",
+									"    \r",
+									"    // Guardar el ID del producto actual para eliminar en la variable de entorno\r",
+									"    pm.environment.set(\"currentProductId\", productId);\r",
+									"    \r",
+									"    // Actualizar la lista de productos por eliminar\r",
+									"    pm.environment.set(\"productsToDelete\", JSON.stringify(productsToDelete));\r",
+									"} else {\r",
+									"    // Si ya no hay más productos por eliminar, limpiar las variables de entorno\r",
+									"    pm.environment.unset(\"currentProductId\");\r",
+									"    postman.setNextRequest(null);  // Detener la ejecución de la siguiente request\r",
+									"}"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"//Test\r",
+									"\r",
+									"//Verificar status petición 200 OK\r",
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"//Verificar que el precio del producto eliminado si sea <100\r",
+									"pm.test(\"Producto eliminado con precio < 100 correctamente\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    var price = jsonData.price;\r",
+									"    pm.expect(price).to.be.below(100);\r",
+									"});\r",
+									"\r",
+									"\r",
+									"//Continuación post-response para eliminar productos\r",
+									"\r",
+									"let productsToDelete = JSON.parse(pm.environment.get(\"productsToDelete\") || \"[]\");\r",
+									"\r",
+									"if (productsToDelete.length > 0) {\r",
+									"    // Continuar con la eliminación del siguiente producto\r",
+									"    postman.setNextRequest(\"Delete Product\");\r",
+									"} else {\r",
+									"    // Si ya no quedan productos por eliminar, detener la ejecución\r",
+									"    postman.setNextRequest(null);\r",
+									"}\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{API}}/products/{{currentProductId}}",
+							"host": [
+								"{{API}}"
+							],
+							"path": [
+								"products",
+								"{{currentProductId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Todos los productos",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Validar si el precio es un número válido\r",
+									"pm.test(\"Precio es un número\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    var precio = jsonData[0].price;\r",
+									"    pm.expect(precio).to.be.a('number');\r",
+									"});\r",
+									"\r",
+									"//Validar si se incluye una palabra especifica\r",
+									"pm.test(\"Palabra especifica\", function(){\r",
+									"    pm.expect(pm.response.text()).to.include(\"DANVOUY Womens T Shirt Casual Cotton Short\");\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{API}}/products",
+							"host": [
+								"{{API}}"
+							],
+							"path": [
+								"products"
+							],
+							"query": [
+								{
+									"key": "",
+									"value": "",
+									"disabled": true
+								}
+							]
+						},
+						"description": "Método tipo POST para"
+					},
+					"response": []
+				},
+				{
+					"name": "Obtener Categorías",
+					"request": {
+						"method": "GET",
+						"header": []
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}
